@@ -12,11 +12,11 @@ import (
 
 type Game struct {
 	HomePlayer, AwayPlayer string
-	HomeTeam, AwayTeam string
-	HomeScore, AwayScore string
-	HomeShots, AwayShots string
-	HomeHits, AwayHits string
-	Date time.Time
+	HomeTeam, AwayTeam     string
+	HomeScore, AwayScore   string
+	HomeShots, AwayShots   string
+	HomeHits, AwayHits     string
+	Date                   time.Time
 }
 
 func init() {
@@ -26,7 +26,7 @@ func init() {
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
-	c:=appengine.NewContext(r)
+	c := appengine.NewContext(r)
 	q := datastore.NewQuery("Game").Order("-Date").Limit(10)
 	games := make([]Game, 0, 10)
 	if _, err := q.GetAll(c, &games); err != nil {
@@ -100,14 +100,15 @@ const newGameTemplateHTML = `
 func addgame(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	g := Game{
-		HomeTeam: r.FormValue("hometeam"),
+		HomeTeam:  r.FormValue("hometeam"),
 		HomeScore: r.FormValue("homegoals"),
 		HomeShots: r.FormValue("homeshots"),
-		HomeHits: r.FormValue("homehits"),
-		AwayTeam: r.FormValue("awayteam"),
+		HomeHits:  r.FormValue("homehits"),
+		AwayTeam:  r.FormValue("awayteam"),
 		AwayScore: r.FormValue("awaygoals"),
 		AwayShots: r.FormValue("awayshots"),
-		AwayHits: r.FormValue("awayhits"),
+		AwayHits:  r.FormValue("awayhits"),
+		Date:      time.Now(),
 	}
 	if r.FormValue("side") == "home" {
 		g.AwayPlayer = r.FormValue("opponent")
@@ -127,4 +128,3 @@ func addgame(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }
-		
