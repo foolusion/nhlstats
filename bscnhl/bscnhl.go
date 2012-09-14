@@ -38,27 +38,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var recentGamesTemplate = template.Must(template.New("games").Parse(recentGamesTemplateHTML))
-
-const recentGamesTemplateHTML = `
-<html>
-	<body>
-		<div><a href="/newgame">Add a new game</a></div>
-		{{range .}}
-			<div>
-				<p><b>{{.HomePlayer}}</b> as {{.HomeTeam}}</p>
-				<p>Goals: {{.HomeScore}}</p>
-				<p>Shots: {{.HomeShots}}</p>
-				<p>Hits: {{.HomeHits}}</p>
-				<p><b>{{.AwayPlayer}}</b> as {{.AwayTeam}}</p>
-				<p>Goals: {{.AwayScore}}</p>
-				<p>Shots: {{.AwayShots}}</p>
-				<p>Hits: {{.AwayHits}}</p>
-			</div>
-		{{end}}
-	</body>
-</html>
-`
+var recentGamesTemplate = template.Must(template.ParseFiles("bscnhl/main.html"))
 
 func newgame(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
