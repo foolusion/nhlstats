@@ -11,12 +11,14 @@ import (
 )
 
 type Game struct {
-	HomePlayer, AwayPlayer string
-	HomeTeam, AwayTeam     string
-	HomeScore, AwayScore   string
-	HomeShots, AwayShots   string
-	HomeHits, AwayHits     string
-	Date                   time.Time
+	HomePlayer, AwayPlayer     string
+	HomeTeam, AwayTeam         string
+	HomeScore, AwayScore       string
+	HomeShots, AwayShots       string
+	HomeHits, AwayHits         string
+	Overtime                   bool
+	HomeVerified, AwayVerified bool
+	Date                       time.Time
 }
 
 func init() {
@@ -62,6 +64,7 @@ const newGameTemplateHTML = `
 		<form action="/addgame" method="post">
 			<div><input type="radio" name="side" value="home"></input> Home</div>
 			<div><input type="radio" name="side" value="away"></input> Away</div>
+			<div><input type="checkbox" name="overtime" value="true"></input> Overtime</div>
 			<div>Opponent: <input type="text" name="opponent"></input></div>
 			<div>Home Team: <input type="text" name="hometeam"></input></div>
 			<div>Away Team: <input type="text" name="awayteam"></input></div>
@@ -90,15 +93,20 @@ func addgame(w http.ResponseWriter, r *http.Request) {
 		AwayHits:  r.FormValue("awayhits"),
 		Date:      time.Now(),
 	}
+	if r.FormValue("overtime") == "true" {
+		g.Overtime = true
+	}
 	if r.FormValue("side") == "home" {
 		g.AwayPlayer = r.FormValue("opponent")
 		if u := user.Current(c); u != nil {
 			g.HomePlayer = u.String()
+			g.HomeVerified = true
 		}
 	} else {
 		g.HomePlayer = r.FormValue("opponent")
 		if u := user.Current(c); u != nil {
 			g.AwayPlayer = u.String()
+			g.AwayVerified = true
 		}
 	}
 	_, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Game", nil), &g)
