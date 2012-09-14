@@ -8,14 +8,14 @@
 		{{range .}}
 			<div class="game">
 				<div class="home">
-					<div class="player"><strong>{{.HomePlayer}}</strong></div>
+					<div class="player"><strong>{{.HomePlayer}}{{with .HomeVerified}}✓{{end}}</strong></div>
 					<div class="team">as {{.HomeTeam}}</div>
 					<div class="score">Goals: {{.HomeScore}}</div>
 					<div class="shots">Shots: {{.HomeShots}}</div>
 					<div class="hits">Hits: {{.HomeHits}}</div>
 				</div>
 				<div class="away">
-					<div class="player"><strong>{{.AwayPlayer}}</strong></div>
+					<div class="player"><strong>{{.AwayPlayer}}{{with .AwayVerified}}✓{{end}}</strong></div>
 					<div class="team">as {{.AwayTeam}}</div>
 					<div class="score">Goals: {{.AwayScore}}</div>
 					<div class="shots">Shots: {{.AwayShots}}</div>
