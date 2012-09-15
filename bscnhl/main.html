@@ -4,24 +4,35 @@
 		<link rel="stylesheet" type="text/css" href="/stylesheets/game.css">
 	</head>
 	<body>
-		<div><a href="/newgame">Add a new game</a></div>
-		{{range .}}
-			<div class="game">
-				<div class="home">
-					<div class="player"><strong>{{.HomePlayer}}{{with .HomeVerified}}✓{{end}}</strong></div>
-					<div class="team">as {{.HomeTeam}}</div>
-					<div class="score">Goals: {{.HomeScore}}</div>
-					<div class="shots">Shots: {{.HomeShots}}</div>
-					<div class="hits">Hits: {{.HomeHits}}</div>
-				</div>
-				<div class="away">
-					<div class="player"><strong>{{.AwayPlayer}}{{with .AwayVerified}}✓{{end}}</strong></div>
-					<div class="team">as {{.AwayTeam}}</div>
-					<div class="score">Goals: {{.AwayScore}}</div>
-					<div class="shots">Shots: {{.AwayShots}}</div>
-					<div class="hits">Hits: {{.AwayHits}}</div>
-				</div>
+		<div id="main">
+			<div id="header">
+				<h1>NHL Stats</h1>
 			</div>
-		{{end}}
+			<ul id="menu">
+				<li><a href="/">Home</a></li>
+				<li><a href="/newgame">Add a new game</a></li>
+				<li><a href="/">Logout</a></li>
+			</ul>
+			<div id="content">
+				{{range .}}
+					<div class="game">
+						<div class="home">
+							<div class="player"><strong>{{.HomePlayer}}{{with .HomeVerified}}✓{{end}}</strong></div>
+							<div class="team">as {{.HomeTeam}}</div>
+							<div class="score">Goals: {{.HomeScore}}</div>
+							<div class="shots">Shots: {{.HomeShots}}</div>
+							<div class="hits">Hits: {{.HomeHits}}</div>
+						</div>
+						<div class="away">
+							<div class="player"><strong>{{.AwayPlayer}}{{with .AwayVerified}}✓{{end}}</strong></div>
+							<div class="team">as {{.AwayTeam}}</div>
+							<div class="score">Goals: {{.AwayScore}}</div>
+							<div class="shots">Shots: {{.AwayShots}}</div>
+							<div class="hits">Hits: {{.AwayHits}}</div>
+						</div>
+					</div>
+				{{end}}
+			</div>
+		</div>
 	</body>
 </html>
