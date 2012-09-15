@@ -3,9 +3,9 @@
 	width: 750px;
 }
 #header {
-	background: #A4D2E3;
-	border: 2px #146E90 solid;
-	color: #294D5A;
+	background: #9cc;
+	border: 2px #033 solid;
+	color: #366;
 }
 #menu {
 	margin: 0px;
@@ -28,24 +28,24 @@
 	text-decoration: none;
 	text-transform: uppercase;
 	text-align: center;
-	background: #66E997;
-	color: #024F1F;
+	background: #9f9;
+	color: #060;
 }
 #menu a.sel {
-	background: #024F1F;
-	color: #66E997;
+	background: #060;
+	color: #9f9;
 }
 #menu a:hover {
-	background: #024F1F;
-	color: #66E997;
+	background: #060;
+	color: #9f9;
 }
 .winner {
-	background: #E68217;
-	border: 2px #6D3A03 solid;
+	background: #6f6;
+	border: 2px #060 solid;
 }
 .loser {
-	background: #146e90;
-	border: 2px #023244 dashed;
+	background: #f66;
+	border: 2px #f00 dashed;
 }
 .home {
 	left: 5px;
@@ -60,8 +60,8 @@
 	width: 246px;
 }
 .game {
-	background: #ACB5E7;
-	border: 2px #7587E7 solid;
+	background: #fc9;
+	border: 2px #630 solid;
 	display: block;
 	height: 150px;
 	margin: 4px auto;

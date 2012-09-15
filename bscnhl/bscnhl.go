@@ -7,17 +7,19 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strconv"
 	"time"
 )
 
 type Game struct {
 	HomePlayer, AwayPlayer     string
 	HomeTeam, AwayTeam         string
-	HomeScore, AwayScore       string
-	HomeShots, AwayShots       string
-	HomeHits, AwayHits         string
+	HomeScore, AwayScore       int
+	HomeShots, AwayShots       int
+	HomeHits, AwayHits         int
 	Overtime                   bool
 	HomeVerified, AwayVerified bool
+	Winner                     bool
 	Date                       time.Time
 }
 
@@ -27,15 +29,49 @@ func init() {
 	http.HandleFunc("/addgame", addgame)
 }
 
+type Index struct {
+	Games []Game
+	User  string
+	Login bool
+	URL   string
+}
+
 func root(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
+	u := user.Current(c)
+	var loginURL string
+	if u == nil {
+		url, err := user.LoginURL(c, r.URL.String())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		loginURL = url
+	} else {
+		url, err := user.LogoutURL(c, r.URL.String())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		loginURL = url
+	}
 	q := datastore.NewQuery("Game").Order("-Date").Limit(10)
 	games := make([]Game, 0, 10)
 	if _, err := q.GetAll(c, &games); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := recentGamesTemplate.Execute(w, games); err != nil {
+	i := Index{
+		Games: games,
+		URL:   loginURL,
+	}
+	if u != nil {
+		i.User = u.Email
+		i.Login = false
+	} else {
+		i.Login = true
+	}
+	if err := recentGamesTemplate.Execute(w, i); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -82,15 +118,45 @@ const newGameTemplateHTML = `
 
 func addgame(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
+	homescore, err := strconv.Atoi(r.FormValue("homegoals"))
+	if err != nil {
+		http.Error(w, "Only Integers in Home Goals", http.StatusInternalServerError)
+		return
+	}
+	homeshots, err := strconv.Atoi(r.FormValue("homeshots"))
+	if err != nil {
+		http.Error(w, "Only Integers in Home Shots", http.StatusInternalServerError)
+		return
+	}
+	homehits, err := strconv.Atoi(r.FormValue("homehits"))
+	if err != nil {
+		http.Error(w, "Only Integers in Home Hits", http.StatusInternalServerError)
+		return
+	}
+	awayscore, err := strconv.Atoi(r.FormValue("awaygoals"))
+	if err != nil {
+		http.Error(w, "Only Integers in Away Goals", http.StatusInternalServerError)
+		return
+	}
+	awayshots, err := strconv.Atoi(r.FormValue("awayshots"))
+	if err != nil {
+		http.Error(w, "Only Integers in Away Shots", http.StatusInternalServerError)
+		return
+	}
+	awayhits, err := strconv.Atoi(r.FormValue("awayhits"))
+	if err != nil {
+		http.Error(w, "Only Integers in Away Hits", http.StatusInternalServerError)
+		return
+	}
 	g := Game{
 		HomeTeam:  r.FormValue("hometeam"),
-		HomeScore: r.FormValue("homegoals"),
-		HomeShots: r.FormValue("homeshots"),
-		HomeHits:  r.FormValue("homehits"),
+		HomeScore: homescore,
+		HomeShots: homeshots,
+		HomeHits:  homehits,
 		AwayTeam:  r.FormValue("awayteam"),
-		AwayScore: r.FormValue("awaygoals"),
-		AwayShots: r.FormValue("awayshots"),
-		AwayHits:  r.FormValue("awayhits"),
+		AwayScore: awayscore,
+		AwayShots: awayshots,
+		AwayHits:  awayhits,
 		Date:      time.Now(),
 	}
 	if r.FormValue("overtime") == "true" {
@@ -109,7 +175,12 @@ func addgame(w http.ResponseWriter, r *http.Request) {
 			g.AwayVerified = true
 		}
 	}
-	_, err := datastore.Put(c, datastore.NewIncompleteKey(c, "Game", nil), &g)
+	if g.HomeScore > g.AwayScore {
+		g.Winner = true
+	} else {
+		g.Winner = false
+	}
+	_, err = datastore.Put(c, datastore.NewIncompleteKey(c, "Game", nil), &g)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

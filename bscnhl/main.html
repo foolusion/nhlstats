@@ -11,19 +11,19 @@
 			<ul id="menu">
 				<li><a href="/">Home</a></li>
 				<li><a href="/newgame">Add a new game</a></li>
-				<li><a href="/">Logout</a></li>
+				<li><a href="{{.URL}}">{{if .Login}}Login{{else}}Logout{{end}}</a></li>
 			</ul>
 			<div id="content">
-				{{range .}}
+				{{range .Games}}
 					<div class="game">
-						<div class="home">
+						<div class="home{{if .Winner}} winner{{else}} loser{{end}}">
 							<div class="player"><strong>{{.HomePlayer}}{{with .HomeVerified}}✓{{end}}</strong></div>
 							<div class="team">as {{.HomeTeam}}</div>
 							<div class="score">Goals: {{.HomeScore}}</div>
 							<div class="shots">Shots: {{.HomeShots}}</div>
 							<div class="hits">Hits: {{.HomeHits}}</div>
 						</div>
-						<div class="away">
+						<div class="away{{if .Winner}} loser{{else}} winner{{end}}">
 							<div class="player"><strong>{{.AwayPlayer}}{{with .AwayVerified}}✓{{end}}</strong></div>
 							<div class="team">as {{.AwayTeam}}</div>
 							<div class="score">Goals: {{.AwayScore}}</div>
