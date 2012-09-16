@@ -30,6 +30,8 @@
 							<div class="shots">Shots: {{.AwayShots}}</div>
 							<div class="hits">Hits: {{.AwayHits}}</div>
 						</div>
+						<span class="overtime">{{if .Overtime}}Overtime{{end}}</span>
+						<span class="date">{{.Date}}</span>
 					</div>
 				{{end}}
 			</div>

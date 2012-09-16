@@ -104,12 +104,12 @@ const newGameTemplateHTML = `
 			<div>Opponent: <input type="text" name="opponent"></input></div>
 			<div>Home Team: <input type="text" name="hometeam"></input></div>
 			<div>Away Team: <input type="text" name="awayteam"></input></div>
-			<div>Home Goals: <input type="text" name="homegoals"></input></div>
-			<div>Away Goals: <input type="text" name="awaygoals"></input></div>
-			<div>Home Shots: <input type="text" name="homeshots"></input></div>
-			<div>Away Shots: <input type="text" name="awayshots"></input></div>
-			<div>Home Hits: <input type="text" name="homehits"></input></div>
-			<div>Away Hits: <input type="text" name="awayhits"></input></div>
+			<div>Home Goals: <input type="number" min="0" name="homegoals"></input></div>
+			<div>Away Goals: <input type="number" min="0" name="awaygoals"></input></div>
+			<div>Home Shots: <input type="number" min="0" name="homeshots"></input></div>
+			<div>Away Shots: <input type="number" min="0" name="awayshots"></input></div>
+			<div>Home Hits: <input type="number" min="0" name="homehits"></input></div>
+			<div>Away Hits: <input type="number" min="0" name="awayhits"></input></div>
 			<div><input type="submit" value="Add Game"></div>
 		</form>
 	</body>
