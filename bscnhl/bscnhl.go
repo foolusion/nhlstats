@@ -4,7 +4,6 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"appengine/user"
-	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -76,7 +75,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var recentGamesTemplate = template.Must(template.ParseFiles("bscnhl/main.html"))
+var recentGamesTemplate = template.Must(template.ParseFiles("bscnhl/main.html", "bscnhl/gamelist.html"))
 
 func newgame(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
@@ -91,30 +90,22 @@ func newgame(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusFound)
 		return
 	}
-	fmt.Fprint(w, newGameTemplateHTML)
+	url, err := user.LogoutURL(c, r.URL.String())	
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	i := Index{
+		User: u.Email,
+		Login: false,
+		URL: url,
+	}
+	if err := newGameTemplate.Execute(w, i); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
-const newGameTemplateHTML = `
-<html>
-	<body>
-		<form action="/addgame" method="post">
-			<div><input type="radio" name="side" value="home"></input> Home</div>
-			<div><input type="radio" name="side" value="away"></input> Away</div>
-			<div><input type="checkbox" name="overtime" value="true"></input> Overtime</div>
-			<div>Opponent: <input type="text" name="opponent"></input></div>
-			<div>Home Team: <input type="text" name="hometeam"></input></div>
-			<div>Away Team: <input type="text" name="awayteam"></input></div>
-			<div>Home Goals: <input type="number" min="0" name="homegoals"></input></div>
-			<div>Away Goals: <input type="number" min="0" name="awaygoals"></input></div>
-			<div>Home Shots: <input type="number" min="0" name="homeshots"></input></div>
-			<div>Away Shots: <input type="number" min="0" name="awayshots"></input></div>
-			<div>Home Hits: <input type="number" min="0" name="homehits"></input></div>
-			<div>Away Hits: <input type="number" min="0" name="awayhits"></input></div>
-			<div><input type="submit" value="Add Game"></div>
-		</form>
-	</body>
-</html>
-`
+var newGameTemplate = template.Must(template.ParseFiles("bscnhl/main.html", "bscnhl/newgame.html"))
 
 func addgame(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)

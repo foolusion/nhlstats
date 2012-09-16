@@ -1,0 +1,49 @@
+{{define "teams"}}
+<option>Anaheim</option>
+<option>Boston</option>
+<option>Buffalo</option>
+<option>Calgary</option>
+<option>Carolina</option>
+<option>Chicago</option>
+<option>Colorado</option>
+<option>Columbus</option>
+<option>Dallas</option>
+<option>Detroit</option>
+<option>Edmonton</option>
+<option>Florida</option>
+<option>Los Angeles</option>
+<option>Minnesota</option>
+<option>Montreal</option>
+<option>Nashville</option>
+<option>New Jersey</option>
+<option>New York (I)</option>
+<option>New York (R)</option>
+<option>Ottawa</option>
+<option>Philadelphia</option>
+<option>Phoenix</option>
+<option>Pittsburgh</option>
+<option>San Jose</option>
+<option>St. Louis</option>
+<option>Tampa Bay</option>
+<option>Toronto</option>
+<option>Vancouver</option>
+<option>Washington</option>
+<option>Winnipeg</option>
+{{end}}
+{{define "content"}}
+<form action="/addgame" method="post">
+	<div><input type="radio" name="side" value="home"></input> Home</div>
+	<div><input type="radio" name="side" value="away"></input> Away</div>
+	<div><input type="checkbox" name="overtime" value="true"></input> Overtime</div>
+	<div>Opponent: <input type="text" name="opponent"></input></div>
+	<div>Home Team: <select name="hometeam">{{template "teams"}}</select></div>
+	<div>Away Team: <select name="awayteam">{{template "teams"}}</select></div>
+	<div>Home Goals: <input type="number" min="0" name="homegoals"></input></div>
+	<div>Away Goals: <input type="number" min="0" name="awaygoals"></input></div>
+	<div>Home Shots: <input type="number" min="0" name="homeshots"></input></div>
+	<div>Away Shots: <input type="number" min="0" name="awayshots"></input></div>
+	<div>Home Hits: <input type="number" min="0" name="homehits"></input></div>
+	<div>Away Hits: <input type="number" min="0" name="awayhits"></input></div>
+	<div><input type="submit" value="Add Game"></div>
+</form>
+{{end}}
