@@ -5,7 +5,8 @@
 #header {
 	background: #9cc;
 	border: 2px #033 solid;
-	color: #366;
+	color: #fff;
+	text-align: center;
 }
 #menu {
 	margin: 0px;
