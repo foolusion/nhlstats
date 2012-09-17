@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"fmt"
 )
 
 type Game struct {
@@ -22,10 +23,20 @@ type Game struct {
 	Date                       time.Time
 }
 
+type Profile struct {
+	Account string
+	Name string
+	Wins, Losses, OTL int
+	FavoriteTeam string
+	Friends []string
+}
+	
+
 func init() {
 	http.HandleFunc("/", root)
 	http.HandleFunc("/newgame", newgame)
 	http.HandleFunc("/addgame", addgame)
+	http.HandleFunc("/profile", profile)
 }
 
 type Index struct {
@@ -178,3 +189,47 @@ func addgame(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }
+
+func profile(w http.ResponseWriter, r *http.Request) {
+	c := appengine.NewContext(r)
+	u := user.Current(c)
+	if u == nil {
+		url, err := user.LoginURL(c, r.URL.String())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Location", url)
+		w.WriteHeader(http.StatusFound)
+		return
+	}
+	var prof Profile
+	k := datastore.NewKey(c, "Profile", u.Email, 0, nil)
+	if err := datastore.Get(c, k, &prof); err != nil {
+		prof.Account = u.Email
+		q := datastore.NewQuery("Game").Filter("HomePlayer =", u.Email)	
+		for t := q.Run(c); ; {
+			var g Game
+			_, err := t.Next(&g)
+			if err == datastore.Done {
+				break
+			}
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if g.Winner {
+				prof.Wins++
+			} else if g.Overtime {
+				prof.OTL++
+			} else {
+				prof.Losses++
+			}
+		}
+		if _, err := datastore.Put(c, k, &prof); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	fmt.Fprint(w, prof)
+}	
