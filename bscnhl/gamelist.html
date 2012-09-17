@@ -1,19 +1,19 @@
 {{define "content"}}
 	{{range .Games}}
 		<div class="game">
-			<div class="home{{if .Winner}} winner{{else}} loser{{end}}">
-				<div class="player"><strong>{{.HomePlayer}}{{with .HomeVerified}}✓{{end}}</strong></div>
-				<div class="team">as {{.HomeTeam}}</div>
-				<div class="score">Goals: {{.HomeScore}}</div>
-				<div class="shots">Shots: {{.HomeShots}}</div>
-				<div class="hits">Hits: {{.HomeHits}}</div>
-			</div>
 			<div class="away{{if .Winner}} loser{{else}} winner{{end}}">
 				<div class="player"><strong>{{.AwayPlayer}}{{with .AwayVerified}}✓{{end}}</strong></div>
 				<div class="team">as {{.AwayTeam}}</div>
 				<div class="score">Goals: {{.AwayScore}}</div>
 				<div class="shots">Shots: {{.AwayShots}}</div>
 				<div class="hits">Hits: {{.AwayHits}}</div>
+			</div>
+			<div class="home{{if .Winner}} winner{{else}} loser{{end}}">
+				<div class="player"><strong>{{.HomePlayer}}{{with .HomeVerified}}✓{{end}}</strong></div>
+				<div class="team">as {{.HomeTeam}}</div>
+				<div class="score">Goals: {{.HomeScore}}</div>
+				<div class="shots">Shots: {{.HomeShots}}</div>
+				<div class="hits">Hits: {{.HomeHits}}</div>
 			</div>
 			{{if .Overtime}}<span class="overtime">Overtime</span>{{end}}
 			<span class="date">{{.Date}}</span>

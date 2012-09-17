@@ -48,14 +48,14 @@
 	border: 2px #f00 dashed;
 }
 .home {
-	left: 5px;
+	right: 5px;
 	position: absolute;
 	top: 5px;
 	width: 246px;
 }
 .away {
 	position: absolute;
-	right: 5px;
+	left: 5px;
 	top: 5px;
 	width: 246px;
 }
