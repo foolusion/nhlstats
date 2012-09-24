@@ -6,7 +6,20 @@ import (
 	"appengine/user"
 	"html/template"
 	"net/http"
+	"sort"
 )
+
+type Games []Game
+
+func (s Games) Len() int      { return len(s) }
+func (s Games) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+
+type ByDate struct{ Games }
+type ByDateDesc struct{ Games }
+
+func (s ByDate) Less(i, j int) bool { return s.Games[i].Date.Before(s.Games[j].Date) }
+
+func (s ByDateDesc) Less(i, j int) bool { return s.Games[i].Date.After(s.Games[j].Date) }
 
 type Profile struct {
 	Account      string
@@ -38,7 +51,6 @@ func profile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var prof Profile
-	k := datastore.NewKey(c, "Profile", u.Email, 0, nil)
 	games := make([]Game, 0, 20)
 	prof.Account = u.Email
 	q := datastore.NewQuery("Game").Filter("HomePlayer =", u.Email)
@@ -67,10 +79,9 @@ func profile(w http.ResponseWriter, r *http.Request) {
 		}
 		games = append(games, g)
 	}
-	if _, err := datastore.Put(c, k, &prof); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+
+	sort.Sort(ByDateDesc{games})
+
 	logoutURL, err := user.LogoutURL(c, "/")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
