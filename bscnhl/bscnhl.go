@@ -29,7 +29,7 @@ func init() {
 	http.HandleFunc("/profile", profile)
 }
 
-type Index struct {
+type index struct {
 	Games []Game
 	User  string
 	Login bool
@@ -61,7 +61,7 @@ func root(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	i := Index{
+	i := index{
 		Games: games,
 		URL:   loginURL,
 	}
@@ -96,7 +96,7 @@ func newgame(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	i := Index{
+	i := index{
 		User:  u.Email,
 		Login: false,
 		URL:   url,

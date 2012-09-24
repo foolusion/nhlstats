@@ -4,7 +4,7 @@ import (
 	"appengine"
 	"appengine/datastore"
 	"appengine/user"
-	"fmt"
+	"html/template"
 	"net/http"
 )
 
@@ -15,9 +15,15 @@ type Profile struct {
 	Friends      []string
 }
 
-// TODO: change profiles to update the user data everytime by searching the
-// games they played. Calculate their stats from the profile data and show 
-// the five most recent games.
+type profileindex struct {
+	User         string
+	Login        bool
+	URL          string
+	FavoriteTeam string
+	Friends      []string
+	Games        []Game
+}
+
 func profile(w http.ResponseWriter, r *http.Request) {
 	c := appengine.NewContext(r)
 	u := user.Current(c)
@@ -65,5 +71,23 @@ func profile(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprint(w, prof, games)
+	logoutURL, err := user.LogoutURL(c, "/")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	i := profileindex{
+		User:         u.Email,
+		Login:        false,
+		URL:          logoutURL,
+		FavoriteTeam: prof.FavoriteTeam,
+		Friends:      prof.Friends,
+		Games:        games,
+	}
+
+	if err := profileTemplate.Execute(w, i); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
+
+var profileTemplate = template.Must(template.ParseFiles("bscnhl/main.html", "bscnhl/gamelist.html"))
