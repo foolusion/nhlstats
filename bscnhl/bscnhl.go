@@ -8,29 +8,19 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"fmt"
 )
 
 type Game struct {
-	HomePlayer, AwayPlayer     string
-	HomeTeam, AwayTeam         string
-	HomeScore, AwayScore       int
-	HomeShots, AwayShots       int
-	HomeHits, AwayHits         int
-	Overtime                   bool
-	HomeVerified, AwayVerified bool
-	Winner                     bool
-	Date                       time.Time
+	AwayPlayer, AwayTeam           string
+	AwayScore, AwayShots, AwayHits int
+	AwayVerified                   bool
+	HomePlayer, HomeTeam           string
+	HomeScore, HomeShots, HomeHits int
+	HomeVerified                   bool
+	HomeWon                        bool
+	Overtime                       bool
+	Date                           time.Time
 }
-
-type Profile struct {
-	Account string
-	Name string
-	Wins, Losses, OTL int
-	FavoriteTeam string
-	Friends []string
-}
-	
 
 func init() {
 	http.HandleFunc("/", root)
@@ -101,15 +91,15 @@ func newgame(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusFound)
 		return
 	}
-	url, err := user.LogoutURL(c, r.URL.String())	
+	url, err := user.LogoutURL(c, r.URL.String())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	i := Index{
-		User: u.Email,
+		User:  u.Email,
 		Login: false,
-		URL: url,
+		URL:   url,
 	}
 	if err := newGameTemplate.Execute(w, i); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -178,9 +168,9 @@ func addgame(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if g.HomeScore > g.AwayScore {
-		g.Winner = true
+		g.HomeWon = true
 	} else {
-		g.Winner = false
+		g.HomeWon = false
 	}
 	_, err = datastore.Put(c, datastore.NewIncompleteKey(c, "Game", nil), &g)
 	if err != nil {
@@ -189,47 +179,3 @@ func addgame(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/", http.StatusFound)
 }
-
-func profile(w http.ResponseWriter, r *http.Request) {
-	c := appengine.NewContext(r)
-	u := user.Current(c)
-	if u == nil {
-		url, err := user.LoginURL(c, r.URL.String())
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Location", url)
-		w.WriteHeader(http.StatusFound)
-		return
-	}
-	var prof Profile
-	k := datastore.NewKey(c, "Profile", u.Email, 0, nil)
-	if err := datastore.Get(c, k, &prof); err != nil {
-		prof.Account = u.Email
-		q := datastore.NewQuery("Game").Filter("HomePlayer =", u.Email)	
-		for t := q.Run(c); ; {
-			var g Game
-			_, err := t.Next(&g)
-			if err == datastore.Done {
-				break
-			}
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			if g.Winner {
-				prof.Wins++
-			} else if g.Overtime {
-				prof.OTL++
-			} else {
-				prof.Losses++
-			}
-		}
-		if _, err := datastore.Put(c, k, &prof); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-	fmt.Fprint(w, prof)
-}	
